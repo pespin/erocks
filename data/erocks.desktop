@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=erocks
+Comment=A music player which uses gstreamer + efl
+Type=Application
+Version=0.1
+Exec=erocks
+Icon=erocks
+Terminal=false
+Categories=Application;Utility;
+StartupNotify=true
