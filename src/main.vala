@@ -1,10 +1,10 @@
 int main(string[] args) {
 
 	Elm.init(args);
-	stdout.printf("Emtooth started!\n");
+	stdout.printf("Erocks started!\n");
 		
 		/* create a glib mainloop */
-    gmain = new GLib.MainLoop( null, false );
+    var gmain = new GLib.MainLoop( null, false );
 
     /* integrate glib mainloop into ecore mainloop */
     if ( Ecore.MainLoop.glib_integrate() )
@@ -26,6 +26,18 @@ int main(string[] args) {
 			stderr.printf ("Could not get access to org.freesmartphone.ousaged: %s\n", e.message);
 		}
 #endif
+    
+    
+    
+    
+    
+    
+    var db = new eRocksDB();
+    
+    
+    
+    
+    
     
 
 

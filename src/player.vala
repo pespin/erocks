@@ -11,6 +11,6 @@ public class eRocksPlayer : Object {
 	
 	public void resume() {}
 	
-	public Song get_song_playing();
+//	public Song get_song_playing();
 
 }
