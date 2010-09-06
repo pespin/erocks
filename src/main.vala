@@ -27,19 +27,37 @@ int main(string[] args) {
 		}
 #endif
     
-    
-    
-    
-    
-    
-    var db = new eRocksDB();
-    
-    
-    
-    
-    
-    
+    DB = new eRocksDB();
 
+    /*var songs = DB.get_all_songs();
+    
+    foreach(var song in songs) {
+			stdout.printf("SONG -> title: %s; album: %s; author: %s;\n", song.title, song.get_album_name(), song.get_artist_name()); 
+	}
+	
+	var albums = DB.get_all_albums();
+    
+    foreach(var album in albums) {
+			stdout.printf("ALBUM -> title: %s; author: %s;\n", album.name, album.get_artist_name()); 
+	} 
+	
+	var artists = DB.get_all_artists(); 
+
+	stdout.printf("\n\n-------------------------\n\n\n\n"); */
+    var artists = DB.get_all_artists(); 
+    foreach(var artist in artists) {
+			stdout.printf("ARTIST="+artist.name+";\n");
+			Album[]? album_list = artist.get_albums();
+			foreach (var album in album_list) {
+				stdout.printf("\tALBUM="+album.name+";\n");
+				Song[]? song_list = album.get_songs();
+				
+				foreach(var song in song_list) {
+						stdout.printf("\t\tSONG="+song.title+";\n");
+				}
+				
+			} 
+	} 
 
 	/* ENTER MAIN LOOP */
     Elm.run();

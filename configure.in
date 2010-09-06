@@ -29,9 +29,7 @@ AC_SUBST(EROCKS_LIBS)
 AC_SUBST(EROCKS_CFLAGS)
 AC_SUBST(EROCKS_PACKAGES)
 
-
-EROCKS_VALAFLAGS=""
-
+EROCKS_VALAFLAGS="--thread"
 
 
 AC_ARG_ENABLE([fso],
@@ -46,10 +44,9 @@ AC_ARG_ENABLE([fso],
    [enable_fso="no"])
 
 
-EROCKS_VALAFLAGS=""
 if test "x$enable_fso" = "xyes" ; then
 	echo "ADDING FSO SUPPORT FOR THIS BUILD..."
-   EROCKS_VALAFLAGS="--define=_FSO_"
+   EROCKS_VALAFLAGS="$EROCKS_VALAFLAGS --define=_FSO_"
 fi
 AC_SUBST(EROCKS_VALAFLAGS)
 

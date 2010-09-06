@@ -1,10 +1,12 @@
 
-const string DEFAULT_PLAYLIST_DIR = "/media/part_ext4/musica";
+const string DEFAULT_PLAYLIST_DIR = "/";
 
 const string DEFAULT_ARTIST_NAME = "Unknown";
 const string DEFAULT_ALBUM_NAME = "Unknown";
 const string DEFAULT_SONG_NAME = "Unknown";
 
+
+eRocksDB DB;
 
 public class eRocksDB : Object {
 	
@@ -45,10 +47,132 @@ public class eRocksDB : Object {
 	}
 	
 	
-	/*
-	public Song[] get_all_songs() {}
-	public Album[] get_all_albums() {}
-	public Artist[] get_all_artists() {}
+	//sql: SELECT one_field FROM whatever WHERE whatever => string
+	public string? fetch_field_from_sql(string sql) {
+		
+		string[] res;
+		int rc, nrow, ncol;
+		string err;
+		
+		rc = db.get_table (sql, out res, out nrow, out ncol, out err); 
+			if( rc != Sqlite.OK) {
+				stderr.printf ("ERR: Can't fetch string from database: %d, %s\t sql=>%s\n", rc, err, sql);
+				return null;
+			}
+		//exists:	
+		if(nrow>0) {
+			return res[1];	
+		}
+		return null;
+		
+	}
+	
+
+	public Artist[]? get_all_artists() {
+		
+		string[] res;
+		int rc, nrow, ncol;
+		string err, sql;
+		Artist[] list;
+		
+		sql = "SELECT id,name FROM 'main'.'artists' ORDER BY name";
+		rc = db.get_table (sql, out res, out nrow, out ncol, out err); 
+		if( rc != Sqlite.OK) {
+			stderr.printf ("ERR: Can't retrieve albums from database: %d, %s\n", rc, err);
+			return null;
+		}
+		
+		list = new Artist[nrow];
+		
+		uint i=ncol;
+		for(int index=0; index<nrow; index++) {
+			list[index] = new Artist();
+			list[index].id = (uint) res[i].to_int();
+			list[index].name = res[i+1];		
+			i+=ncol;
+		}
+		
+		//stdout.printf("INFO: ArtistList loaded correctly\n");
+	
+	
+		return list;
+	}
+		
+	
+
+	public Album[]? get_all_albums() {
+		string sql;
+		
+		sql = "SELECT id,name,artist FROM 'main'.'albums' ORDER BY name";
+		return this.get_albums_from_sql(sql);
+	}
+		
+		
+	public Album[]? get_albums_from_sql(string sql) {	
+		string[] res;
+		int rc, nrow, ncol;
+		string err;
+		Album[] list;
+		
+		rc = db.get_table (sql, out res, out nrow, out ncol, out err); 
+		if( rc != Sqlite.OK) {
+			stderr.printf ("ERR: Can't retrieve albums from database: %d, %s\t sql=>%s\n", rc, err, sql);
+			return null;
+		}
+		
+		list = new Album[nrow];
+		
+		uint i=ncol;
+		for(int index=0; index<nrow; index++) {
+			list[index] = new Album.filled ( (uint) res[i].to_int(), res[i+1], (uint) res[i+2].to_int() );		
+			i+=ncol;
+		}
+		
+		//stdout.printf("INFO: AlbumList loaded correctly\n");
+	
+	
+		return list;
+	}
+		
+		
+		
+	public Song[]? get_all_songs() {
+		string sql;
+		
+		sql = "SELECT id,path,title,album,artist,duration FROM 'main'.'songs' ORDER BY title";
+		return this.get_songs_from_sql(sql);
+	}
+	
+	
+	public Song[]? get_songs_from_sql(string sql) {
+		
+		string[] res;
+		int rc, nrow, ncol;
+		string err;
+		Song[] list;
+		
+		rc = db.get_table (sql, out res, out nrow, out ncol, out err); 
+		if( rc != Sqlite.OK) {
+			stderr.printf ("ERR: Can't retrieve songs from database: %d, %s\t sql=>%s\n", rc, err, sql);
+			return null;
+		}
+		
+		list = new Song[nrow];
+		
+		uint i=ncol;
+		for(int index=0; index<nrow; index++) {
+			//stdout.printf("id: %u; path: %s; title: %s; album: %u; artist: %u; duration: %u;\n", (uint) res[i].to_int(), res[i+1], res[i+2], (uint) res[i+3].to_int(), (uint) res[i+4].to_int(), (uint) res[i+5].to_int());
+			list[index] = new Song.filled ( (uint) res[i].to_int(), res[i+1], res[i+2], (uint) res[i+3].to_int(), (uint) res[i+4].to_int(), (uint) res[i+5].to_int() );		
+			i+=ncol;
+		}
+		
+		//stdout.printf("INFO: SongList loaded correctly\n");
+	
+	
+		return list;
+	}
+		
+/*
 	
 	public Song[] get_matching_songs() {}
 	public Album[] get_matching_albums() {}
@@ -105,10 +229,13 @@ public class eRocksDB : Object {
 	}
 	
 	public void fill() {
-		
-		this.add_songs_in_dir.begin(DEFAULT_PLAYLIST_DIR); //TODO: change this
-		
+		this.fill_wait.begin();
 		}
+		
+	private async void fill_wait() {
+		yield this.add_songs_in_dir(DEFAULT_PLAYLIST_DIR); //TODO: change this
+		stdout.printf("Finished filling the database!\n");
+	}
 	
 	
     private async void add_songs_in_dir (string path) {
@@ -161,6 +288,11 @@ public class eRocksDB : Object {
 		if(file.tag.album=="" || file.tag.album==null) {
 			stdout.printf("Album tag on %s is empty, setting it to default %s\n", path, DEFAULT_ALBUM_NAME);
 			file.tag.album = DEFAULT_ALBUM_NAME;
+		}
+		
+		if(file.tag.title=="" || file.tag.title==null) {
+			stdout.printf("Title tag on %s is empty, setting it to default %s\n", path, DEFAULT_SONG_NAME);
+			file.tag.title = DEFAULT_SONG_NAME;
 		}
 		
 		uint artist_id = this.get_artist_id(file.tag.artist);
