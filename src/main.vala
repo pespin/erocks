@@ -44,6 +44,7 @@ int main(string[] args) {
 	var artists = DB.get_all_artists(); 
 
 	stdout.printf("\n\n-------------------------\n\n\n\n"); */
+	
     var artists = DB.get_all_artists(); 
     foreach(var artist in artists) {
 			stdout.printf("ARTIST="+artist.name+";\n");
@@ -57,7 +58,14 @@ int main(string[] args) {
 				}
 				
 			} 
-	} 
+	}
+	
+	var random_song = DB.get_random_song();
+	
+	stdout.printf("Got random song with tittle: %s\n", random_song.title);
+	
+	PLAYER = new eRocksPlayer(args);
+	PLAYER.play(random_song);
 
 	/* ENTER MAIN LOOP */
     Elm.run();

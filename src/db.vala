@@ -1,5 +1,5 @@
 
-const string DEFAULT_PLAYLIST_DIR = "/";
+const string DEFAULT_PLAYLIST_DIR = "/media/part_ext4/musica/cd_ester";
 
 const string DEFAULT_ARTIST_NAME = "Unknown";
 const string DEFAULT_ALBUM_NAME = "Unknown";
@@ -171,6 +171,28 @@ public class eRocksDB : Object {
 	
 		return list;
 	}
+	
+	
+	public Song? get_random_song() {
+		string[] res;
+		int rc, nrow, ncol;
+		string err, sql;
+		
+		sql = "SELECT id,path,title,album,artist,duration FROM 'main'.'songs' ORDER BY RANDOM() LIMIT 1";
+		rc = db.get_table (sql, out res, out nrow, out ncol, out err); 
+		if( rc != Sqlite.OK) {
+			stderr.printf ("ERR: Can't retrieve songs from database: %d, %s\t sql=>%s\n", rc, err, sql);
+			return null;
+		}
+		
+		if(nrow<1) return null;
+		
+		
+		return new Song.filled ( (uint) res[ncol].to_int(), res[ncol+1], res[ncol+2], 
+							(uint) res[ncol+3].to_int(), (uint) res[ncol+4].to_int(), 
+							(uint) res[ncol+5].to_int() );		
+		
+	}
 		
 /*
 	
@@ -229,13 +251,8 @@ public class eRocksDB : Object {
 	}
 	
 	public void fill() {
-		this.fill_wait.begin();
+		this.add_songs_in_dir.begin(DEFAULT_PLAYLIST_DIR, (s,r) => { this.fill_finished(s,r); this.add_songs_in_dir.end(r); });
 		}
-		
-	private async void fill_wait() {
-		yield this.add_songs_in_dir(DEFAULT_PLAYLIST_DIR); //TODO: change this
-		stdout.printf("Finished filling the database!\n");
-	}
 	
 	
     private async void add_songs_in_dir (string path) {
@@ -302,6 +319,12 @@ public class eRocksDB : Object {
 		//stdout.printf(sql+"\n");
 		if( (rc=db.exec(sql, null, out err)) !=0 )
 			stdout.printf("ERR: Adding song to database ended with error code %d (error: %s)\n", rc, err); 
+		
+	}
+	
+
+	private void fill_finished (Object? source_object, AsyncResult res)  {
+			stdout.printf("Finished filling the database!\n");
 		
 	}
 	
