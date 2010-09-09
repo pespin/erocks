@@ -27,7 +27,7 @@ int main(string[] args) {
 		}
 #endif
     
-    DB = new eRocksDB();
+    //DB = new eRocksDB();
 
     /*var songs = DB.get_all_songs();
     
@@ -44,8 +44,9 @@ int main(string[] args) {
 	var artists = DB.get_all_artists(); 
 
 	stdout.printf("\n\n-------------------------\n\n\n\n"); */
+	/* 
 	
-    var artists = DB.get_all_artists(); 
+	var artists = DB.get_all_artists(); 
     foreach(var artist in artists) {
 			stdout.printf("ARTIST="+artist.name+";\n");
 			Album[]? album_list = artist.get_albums();
@@ -65,7 +66,9 @@ int main(string[] args) {
 	stdout.printf("Got random song with tittle: %s\n", random_song.title);
 	
 	PLAYER = new eRocksPlayer(args);
-	PLAYER.play(random_song);
+	PLAYER.play(random_song); */
+	
+	UI = new PlayerViewUI();
 
 	/* ENTER MAIN LOOP */
     Elm.run();

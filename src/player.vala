@@ -27,11 +27,11 @@ public class eRocksPlayer : GLib.Object {
 	
 	public void stop() {
 		gstplayer.set_state (State.NULL);
-		gstplayer.uri = NULL;
+		gstplayer.uri = null;
 		}
 	
 	public void pause() {
-		gstplayer.set_state (State.PAUSE);
+		gstplayer.set_state (State.PAUSED);
 		}
 	
 	
@@ -51,7 +51,6 @@ public class eRocksPlayer : GLib.Object {
             string debug;
             message.parse_error (out err, out debug);
             stdout.printf ("Error: %s\n", err.message);
-            //loop.quit ();
             break;
         case MessageType.EOS:
             stdout.printf ("end of stream\n");

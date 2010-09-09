@@ -12,6 +12,7 @@ erocks_SOURCES = \
 	src/song.vala \
 	src/album.vala \
 	src/artist.vala \
+	src/ui.vala \
 	src/fso.vala
 	
 erocks_LDADD = @EROCKS_LIBS@
@@ -21,3 +22,14 @@ VALAFLAGS = @EROCKS_PACKAGES@ @EROCKS_VALAFLAGS@
 desktopdir = $(datadir)/applications
 desktop_DATA = data/erocks.desktop
 
+
+#EDJE:
+filesdir = $(datadir)/erocks/
+files_DATA = data/erocks.edj
+
+clean-local:
+	rm -f data/*.edj
+
+
+data/erocks.edj: data/default.edc data/playerview.edc data/images.edc
+	@edje_cc@ data/default.edc data/erocks.edj
